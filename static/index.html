@@ -42,14 +42,14 @@
       <div class="refresh">
         <button id="new-streamer-button" disabled>please wait...</button>
       </div> -->
-      
-      <div class="refresh">
-        <button id="refresh-raid-button">refresh raids</button>
+
+
+      <div class="join-raid-div">
+        <button id="join-raid-button" disabled>please wait...</button>
+
+        <span id="refresh-raid-button" class="cursor-text">refresh raids</span>
       </div>
     </div>
-      <div class="refresh">
-        <button id="join-raid-button" disabled>please wait...</button>
-      </div>
 
 
     <div id="twitch-embed" class="container" style="display: none;"></div>
@@ -146,6 +146,13 @@
 
 
       async function getRaid() {
+        // very convulated way of changing button location after first press
+        raidButton.parentNode.className = "refresh";
+        raidButton.style.margin = '0';
+        raidButton.style.padding = '10px 20px';
+        raidButton.style.fontSize = '18px';
+        refreshButton.style.fontSize = '12px';
+        refreshButton.style.padding = '10px';
         fetch(`${server}/streamraid`).then(response => response.json())
           .then(stream => {
             // when getRaid is called and we aren't counting start raid
