@@ -1,4 +1,6 @@
-# nodbody.live
+# lonelyraids.com
+
+A modification to jkingsman's [Nobody.live](https://github.com/jkingsman/Nobody.live) to allow users to perform "raids" (in this case, where a ~large~ amount of viewers all collectively tune in to one stream) on twitch streamers with zero viewers.
 
 ## Architecture
 
@@ -9,7 +11,7 @@ Environment variables to be set:
 * `CLIENT_ID`: Your Twitch application client ID (found at https://dev.twitch.tv/console)
 * `CLIENT_SECRET`: Your Twitch application client secret (found at https://dev.twitch.tv/console)
 
-Meanwhile, the Flask app in `app.py` serves the index and the endpoint to get a random streamer.
+Meanwhile, the Flask app in `app.py` serves the index and the endpoint to get a random streamer. 
 
 ## Getting Up and Running
 

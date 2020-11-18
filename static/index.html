@@ -14,10 +14,10 @@
 
     <meta property="og:title" content="Watch streamers with no audience">
     <meta property="og:site_name" content="Nobody.Live">
-    <meta property="og:url" content="https://nobody.live/">
+    <meta property="og:url" content="https://lonelyraids.com/">
     <meta property="og:description" content="Become the entire audience of a lonely streamer broadcasting to zero viewers">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://nobody.live/og.png">
+    <meta property="og:image" content="https://lonelyraids.com/og.png">
 
     <meta name="title" content="Nobody.Live -- Lonely Streams with No Audience">
     <meta name="description" content="Become the entire audience of a lonely streamer broadcasting to zero viewers">
@@ -33,43 +33,48 @@
   <body>
     <div class="grid-container">
       <div class="intro-text">
-        <h1>nobody.live</h1>
-        <p>streams with nobody watching</p>
+        <h1>lonelyraids</h1>
+        <p>joining streams with zero viewers</p>
       </div>
       <div class="refresh2">
-        <button id="join-train-button" disabled>please wait...</button>
+        <button id="join-raid-button" disabled>please wait...</button>
       </div>
       <div class="refresh">
-        <button id="new-streamer-button" disabled>please wait...</button>
+        <button id="refresh-raid-button">refresh raids</button>
       </div>
+      <!--
+      <div class="refresh">
+        <button id="new-streamer-button" disabled>please wait...</button>
+      </div> -->
     </div>
-    <div id="twitch-embed" class="container"></div>
-    <div class="thumbnails container center-text">
-      <span id="new-thumbnails" role="button" class="fake-link subdued">Get new stream thumbnails</span>
-      <div id="thumbnails" class="thumbnail-container"></div>
-    </div>
+    <div id="twitch-embed" class="container" style="display: none;"></div>
     <div id="footer">
       this stream had zero viewers as of <span id="stream-zero-time"></span> seconds ago
       <br><br>
       last five streams watched: <span id="stream-list"></span>
       <br><br>
-      made with <a href="https://github.com/jkingsman/Nobody.live" target="_blank" rel="noopener">open source</a> and love by jack kingsman, with much appreciation for carsten hoffrichter's <i>lonely streams</i>
+      <a href="https://github.com/tybens/lonelyraids.com" target="_blank" rel="noopener">open source</a> made by tyler benson, forked from my great friend jack kingsman's <i>Nobody.live</i>
     </div>
 
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script type="text/javascript">
-      let numberOfThumbnailsToFetch = 12;
-      let server =  window.location.hostname === '127.0.0.1' ? 'http://localhost:5000':'https://nobody.live';
-      let trainId = NaN
+      let server =  window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1:5000':'https://lonelyraids.com';
+      var counting = false;
+      var raidStream;
+      const raidButton = document.getElementById('join-raid-button');
+      const refreshButton = document.getElementById('refresh-raid-button');
+      raidButton.disabled = false;
+      raidButton.innerText = 'start raid';
 
       function displayStream(stream) {
         // clear and rerender the embed div
         document.getElementById('twitch-embed').innerHTML = '';
+        document.getElementById('twitch-embed').style.display = '';
         new Twitch.Embed('twitch-embed', {
           width: '100%',
           channel: stream.user_name,
           theme: 'dark',
-          parent: ['nobody.live']
+          parent: ['lonelyraids.com']
         });
 
         document.getElementById('stream-zero-time').innerText = (Math.round(new Date().getTime() / 1000  - stream.fetched));
@@ -92,146 +97,71 @@
           return a.outerHTML;
         }).join(', ');
       }
-      // execute find trainId every 60 seconds
-      var intervalId = window.setInterval(fetchTrainId, 60000)
-      var foundTrainId = false
-      let changingIn = 60
-      function fetchTrainId() {
-        fetch(`${server}/streamtrain`).then(response => response.json())
-          .then(newTrainId => {
-            console.log(newTrainId)
-            trainId = newTrainId;
-            foundTrainId = true;
-            changingIn = 60;
-          }).catch((error) => {
-            console.eror('Error:', error)
-          });
-      }
-      fetchTrainId()
 
-      // join train button show countdown
-      var intervalId = window.setInterval(setChangingIn, 1000)
-      function setChangingIn() {
-        document.getElementById('join-train-button').disabled = false;
-        document.getElementById('join-train-button').innerText = 'join twitch train! new streamer in ' + changingIn + ' seconds';
-        if (changingIn > 0) {
-          changingIn = changingIn - 1;
-        }
+      function str_pad_left(string,pad,length) {
+        return (new Array(length+1).join(pad)+string).slice(-length);
       }
 
-      async function fetchAndRenderStreamTrain() {
-        document.getElementById('join-train-button').disabled = true;
-        document.getElementById('join-train-button').innerText = 'please wait...';
-        setTimeout(() => {
-          document.getElementById('join-train-button').disabled = false;
-        }, 4000);
+        /*Countdown script*/
+      async function countdown(counter) {
+        counting = true
+         // 3 minutes
+        var interval = setInterval(function() {
+          counter--;
+          if (counter == 0) {
+            clearInterval(interval);
+            counting = false;
+            raidButton.innerText = 'start raid'
 
-        fetch(`${server}/streamtrainId/${trainId}`).then(response => response.json())
-          .then(stream => {
-            console.log('Got stream:', stream);
+          } else {
+            var minutes = Math.floor(counter / 60);
+            var seconds = counter % 60;
+            var countdownStr = str_pad_left(minutes,'0',2)+':'+str_pad_left(seconds,'0',2);
+            raidButton.innerText = "join started raid " + countdownStr;
+          };
+        }, 1000);
+      };
+          
+      async function getCountdown() {
+        fetch(`${server}/countdown`).then(response => response.json())
+          .then(counter => {
+            console.log(counter)
+            if ((!counting) && (counter.countdown!= 0)) {
+              countdown(counter.countdown);
 
-            if (Object.keys(stream).length === 0) {
-              alert("Uh oh! There's been an issue retrieving a stream. Either there are no streams (unlikely) or something is broken.")
-              return
-            }
-
-            displayStream(stream);
-          }).catch((error) => {
-            console.error('Error:', error);
-          });
-
-
-      }
-      async function fetchAndRenderRandomStream() {
-        // disable button to do some hacky rate limiting
-        document.getElementById('new-streamer-button').disabled = true;
-        document.getElementById('new-streamer-button').innerText = 'please wait...';
-        setTimeout(() => {
-          document.getElementById('new-streamer-button').disabled = false;
-          document.getElementById('new-streamer-button').innerText = 'random streamer';
-        }, 4000);
-
-        fetch(`${server}/stream`).then(response => response.json())
-          .then(stream => {
-            console.log('Got stream:', stream);
-
-            if (Object.keys(stream).length === 0) {
-              alert("Uh oh! There's been an issue retrieving a stream. Either there are no streams (unlikely) or something is broken.")
-              return
-            }
-
-            displayStream(stream);
-          }).catch((error) => {
-            console.error('Error:', error);
-          });
-      }
-
-      async function fetchAndRenderThumbnails(_event, thumbs = numberOfThumbnailsToFetch) {
-        let container = document.getElementById('thumbnails');
-
-        // if this is not our first load, lock elem height so there's no shudder as we load new ones
-        if (container.childNodes.length != 0) {
-          container.style.height = `${container.offsetHeight}px`;
-        }
-
-        container.innerHTML = '';
-
-        fetch(`${server}/streams/${thumbs}`).then(response => response.json())
-          .then(streams => streams.forEach(stream => {
-            // embed inside of an a element so you can open in a new tab
-            let a = document.createElement('a');
-            a.href = `${window.location.origin}/?stream=${encodeURIComponent(JSON.stringify(stream))}`;
-            // override the default so on-page clicks just run the render code
-            a.onclick = (event) => {
-              if (!event.ctrlKey && !event.metaKey) {
-                event.preventDefault();
-                displayStream(stream);
-
-                document.body.scrollTop = 0; // For Safari
-                document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-              }
+            } else {
+              raidButton.innerText = 'start raid'
             };
-            a.rel = 'noopener';
-
-            let thumb = document.createElement('img');
-            thumb.className = "thumbnail-item";
-            thumb.alt = thumb.title = `${stream.user_name}: ${stream.title || '[No title]'}`
-            thumb.src = stream.thumbnail_url.replace('{width}', '440').replace('{height}', '248');
-
-            a.appendChild(thumb);
-            container.appendChild(a);
-          }));
-
-          // restore any height locking we did after the thumbs have had a chance to load
-          setTimeout(() => container.style.height = 'auto', 1000);
+          }).catch((error) => {
+            console.error('Error:', error);
+          });
       }
 
-      document.getElementById('new-streamer-button').addEventListener('click', fetchAndRenderRandomStream);
-      document.getElementById('new-thumbnails').addEventListener('click', fetchAndRenderThumbnails);
-      document.getElementById('join-train-button').addEventListener('click', fetchAndRenderStreamTrain)
 
-      // little treat for the readers :)
-      document.addEventListener("keydown", event => {
-        if (event.keyCode === 82) {
-          numberOfThumbnailsToFetch = 64;
+      async function getRaid() {
+        fetch(`${server}/streamraid`).then(response => response.json())
+          .then(stream => {
+            // when getRaid is called and we aren't counting start raid
 
-          if (event.altKey) {
-              fetchAndRenderThumbnails();
-          }
+            raidStream = stream;
+            displayStream(raidStream);
+
+        
+            getCountdown()
+
+          }).catch((error) => {
+            console.error('Error:', error);
+          });
         }
-      });
 
-      // if we have /?stream=... then render the specified stream
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('stream')) {
-        console.log(`Loading stream from URL: "${urlParams.get('stream')}")`)
-        displayStream(JSON.parse(urlParams.get('stream')));
-        window.history.pushState({}, document.title, window.location.pathname);
-      } else {
-        fetchAndRenderRandomStream();
-      }
 
-      fetchAndRenderThumbnails();
+      // TODO: Allow users to browse random streams until starting a raid on a specific one
+      // document.getElementById('new-streamer-button').addEventListener('click', fetchAndRenderRandomStream); 
+      raidButton.addEventListener('click', getRaid)
+      refreshButton.addEventListener('click', getCountdown)
+
+      window.onload = getCountdown(); // issue get countdown upon loading the page
+
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF3B0HFYJ"></script>
     <script>

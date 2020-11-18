@@ -4,22 +4,37 @@ import json
 import os.path
 import datetime
 import redis
+from threading import Thread
+from time import sleep
 
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
+
 app = Flask(__name__, static_url_path='', static_folder='static')
 CORS(app)
 main_redis = redis.Redis(decode_responses=True, db=0)
 stats_redis = redis.Redis(decode_responses=True, db=1)
+streamRaid = None
+raidLength = 60
+countdown = raidLength
 
+def timer():
+    global streamRaid
+    global countdown
+    # countdown
+    while countdown > 0:
+        sleep(1)
+        countdown -= 1
+    # reset global variables
+    streamRaid = None
+    countdown = raidLength
 
-def getStreams(count = 1, trainId=None):
+timer_thread = Thread(target=timer)
+
+def getStreams(count = 1):
     results = []
     for i in range(int(count)):
-        if trainId is None:
-            key = main_redis.randomkey()
-        else:
-            key = main_redis.keys(pattern='*{}*'.format(trainId))[0]
+        key = main_redis.randomkey()
 
         if not key:
             return results
@@ -38,26 +53,29 @@ def root():
 @app.route('/stream')
 def get_stream():
     streams = getStreams()
-
     if streams:
         return streams[0]
     return '{}'
 
-@app.route('/streamtrainId/<trainId>')
-def get_stream_train(trainId):
-    print("Trainid: ", trainId)
-    streams = getStreams(trainId=trainId)
-    if streams:
-        return streams[0]
-    return '{}'
+@app.route('/streamraid')
+def get_streamraid():
+    global streamRaid
+    global timer_thread
+    if streamRaid is None:
+        streamRaid = getStreams()[0]
+        timer_thread = Thread(target=timer)
+        timer_thread.start()
 
-@app.route('/streamtrain')
-def get_stream_trainId():
-    key = main_redis.randomkey()
-    stream = json.loads(key)
-    trainId = stream['id']
+    return streamRaid
 
-    return trainId
+@app.route('/countdown')
+def get_countdowntime():
+    global timer_thread
+    global countdown
+    if timer_thread.isAlive():
+        return {'countdown': countdown}
+    return {'countdown': 0}
+
 
 
 @app.route('/streams', defaults={'count': 20})

@@ -66,7 +66,7 @@ a,
   #new-streamer-button {
     margin-top: 20px;
   }
-  #join-train-button {
+  #join-raid-button {
     margin-top: 20px;
   }
 }
@@ -91,7 +91,7 @@ a,
   cursor: wait;
 }
 
-#join-train-button {
+#join-raid-button {
   background-color: #008a07;
   border: none;
   color: white;
@@ -104,8 +104,8 @@ a,
   cursor: pointer;
 }
 
-#join-train-button:disabled,
-#join-train-button[disabled] {
+#join-raid-button:disabled,
+#join-raid-button[disabled] {
   background-color: #efefef;
   cursor: wait;
 }
