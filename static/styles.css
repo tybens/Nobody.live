@@ -1,6 +1,6 @@
 body {
   margin: 10px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Courier New", Courier, monospace;
   background: #131313;
   color: #eeebff;
 }
@@ -23,26 +23,19 @@ a,
   padding: 10px;
 }
 
-.thumbnails {
-  text-align: center;
-}
-
-@media only screen and (min-width: 750px) {
+@media only screen and (min-width: 500px) {
   .grid-container {
     display: grid;
-    grid-template-columns: 33.33% 33.33% 33.33%;
+    grid-template-columns: 80% 20%;
     grid-template-rows: 1fr;
-    grid-gap: 0px 10px;
-    grid-template-areas: "intro-text refresh2 refresh";
+    grid-gap: 0px 0px;
+    grid-template-areas: "intro-text refresh";
     height: 6vh;
   }
   .intro-text {
     grid-area: intro-text;
   }
-  .refresh2 {
-    grid-area: refresh2;
-    align-self: center;
-  }
+
   .refresh {
     grid-area: refresh;
     align-self: center;
@@ -50,45 +43,7 @@ a,
 }
 
 .intro-text {
-  font-style: italic;
-}
-
-.thumbnail-container {
-  display: grid;
-  grid-template-columns: 25% 25% 25% 25%;
-}
-
-@media only screen and (max-width: 750px) {
-  .thumbnail-container {
-    display: grid;
-    grid-template-columns: 33.33% 33.33% 33.33%;
-  }
-  #new-streamer-button {
-    margin-top: 20px;
-  }
-  #join-raid-button {
-    margin-top: 20px;
-  }
-}
-
-#new-streamer-button {
-  background-color: #008a07;
-  border: none;
-  color: white;
-  padding: 10px 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  width: 100%;
-  cursor: pointer;
-}
-
-
-#new-streamer-button:disabled,
-#new-streamer-button[disabled] {
-  background-color: #efefef;
-  cursor: wait;
+  font-style: bold;
 }
 
 #join-raid-button {
@@ -100,8 +55,18 @@ a,
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  width: 100%;
+  /*width: 100%;*/
   cursor: pointer;
+
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  margin: -100px 0 0 -150px;
+  /*background: red;*/
+}
 }
 
 #join-raid-button:disabled,
@@ -112,21 +77,23 @@ a,
 
 #twitch-embed,
 #twitch-embed>iframe {
-  min-height: 85vh;
+  min-height: 100vh;
 }
 
-.thumbnail-item {
-  border: 1px solid rgba(0, 0, 0, 0.8);
-  font-size: 30px;
-  text-align: center;
-  margin: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  width: 90%;
-  justify-self: center;
+#page-container {
+  position: relative;
+  min-height: 95vh;
+}
+
+#content-wrap {
+  padding-bottom: 6px;    /* Footer height */
 }
 
 #footer {
+  position: absolute;
+  width: 100%;
+  height: 6rem;
   text-align: center;
-  margin-top: 13px;
+  margin-top: 0px;
+  bottom: 0px;
 }

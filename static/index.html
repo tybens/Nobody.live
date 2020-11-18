@@ -12,49 +12,56 @@
     <meta name="msapplication-TileColor" content="#6441a5">
     <meta name="theme-color" content="#6441a5">
 
-    <meta property="og:title" content="Watch streamers with no audience">
-    <meta property="og:site_name" content="Nobody.Live">
+    <meta property="og:title" content="Join streamers with no audience">
+    <meta property="og:site_name" content="LonelyRaids">
     <meta property="og:url" content="https://lonelyraids.com/">
-    <meta property="og:description" content="Become the entire audience of a lonely streamer broadcasting to zero viewers">
+    <meta property="og:description" content="Make the day by filling the audience of a lonely streamer broadcasting to zero viewers">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://lonelyraids.com/og.png">
 
-    <meta name="title" content="Nobody.Live -- Lonely Streams with No Audience">
+    <meta name="title" content="LonelyRaids -- Lonely Streams with No Audience">
     <meta name="description" content="Become the entire audience of a lonely streamer broadcasting to zero viewers">
     <meta name="keywords" content="stream, no viewers stream, streams with no audience, twitch no viewers">
     <meta name="robots" content="index, follow">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="language" content="English">
-    <meta name="author" content="Jack Kingsman">
+    <meta name="author" content="Tyler Benson">
 
-    <title>Nobody.live | Lonely streams and streamers with zero viewers</title>
+    <title>LonelyRaids | collectively joining lonely streams with zero viewers</title>
     <link rel="stylesheet" href="styles.css" type="text/css">
   </head>
   <body>
+    <div id="page-container">
+      <div id="content-wrap">
     <div class="grid-container">
       <div class="intro-text">
         <h1>lonelyraids</h1>
-        <p>joining streams with zero viewers</p>
-      </div>
-      <div class="refresh2">
-        <button id="join-raid-button" disabled>please wait...</button>
-      </div>
-      <div class="refresh">
-        <button id="refresh-raid-button">refresh raids</button>
+        <p>collectively joining streams with zero viewers</p>
       </div>
       <!--
       <div class="refresh">
         <button id="new-streamer-button" disabled>please wait...</button>
       </div> -->
+      
+      <div class="refresh">
+        <button id="refresh-raid-button">refresh raids</button>
+      </div>
     </div>
+      <div class="refresh">
+        <button id="join-raid-button" disabled>please wait...</button>
+      </div>
+
+
     <div id="twitch-embed" class="container" style="display: none;"></div>
+  </div>
     <div id="footer">
       this stream had zero viewers as of <span id="stream-zero-time"></span> seconds ago
       <br><br>
       last five streams watched: <span id="stream-list"></span>
       <br><br>
-      <a href="https://github.com/tybens/lonelyraids.com" target="_blank" rel="noopener">open source</a> made by tyler benson, forked from my great friend jack kingsman's <i>Nobody.live</i>
+      <a href="https://github.com/tybens/lonelyraids.com" target="_blank" rel="noopener">open source</a> made by tyler benson, forked from the great jack kingsman's <i>Nobody.live</i>
     </div>
+  </div>
 
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script type="text/javascript">

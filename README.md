@@ -1,6 +1,6 @@
 # lonelyraids.com
 
-A modification to jkingsman's [Nobody.live](https://github.com/jkingsman/Nobody.live) to allow users to perform "raids" (in this case, where a ~large~ amount of viewers all collectively tune in to one stream) on twitch streamers with zero viewers.
+A modification to jkingsman's [Nobody.live](https://github.com/jkingsman/Nobody.live) to allow users to perform "raids" (in this case, where users all collectively tune in to the same stream stream) on twitch streamers with zero viewers.
 
 ## Architecture
 
