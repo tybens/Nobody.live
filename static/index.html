@@ -47,7 +47,7 @@
       <div class="join-raid-div">
         <button id="join-raid-button" disabled>please wait...</button>
 
-        <span id="refresh-raid-button" class="cursor-text">refresh raids</span>
+        <span id="refresh-raid-button" class="cursor-text">check for raids</span>
       </div>
     </div>
 
@@ -77,6 +77,7 @@
         // clear and rerender the embed div
         document.getElementById('twitch-embed').innerHTML = '';
         document.getElementById('twitch-embed').style.display = '';
+        document.getElementById('twitch-embed').style.padding = '10px';
         new Twitch.Embed('twitch-embed', {
           width: '100%',
           channel: stream.user_name,
@@ -112,6 +113,7 @@
         /*Countdown script*/
       async function countdown(counter) {
         counting = true
+        refreshButton.style.display = 'none';
          // 3 minutes
         var interval = setInterval(function() {
           counter--;
@@ -119,6 +121,7 @@
             clearInterval(interval);
             counting = false;
             raidButton.innerText = 'start raid'
+          refreshButton.style.display = '';
 
           } else {
             var minutes = Math.floor(counter / 60);
@@ -132,7 +135,6 @@
       async function getCountdown() {
         fetch(`${server}/countdown`).then(response => response.json())
           .then(counter => {
-            console.log(counter)
             if ((!counting) && (counter.countdown!= 0)) {
               countdown(counter.countdown);
 
@@ -152,7 +154,7 @@
         raidButton.style.padding = '10px 20px';
         raidButton.style.fontSize = '18px';
         refreshButton.style.fontSize = '12px';
-        refreshButton.style.padding = '10px';
+        refreshButton.style.padding = '2.5px';
         fetch(`${server}/streamraid`).then(response => response.json())
           .then(stream => {
             // when getRaid is called and we aren't counting start raid

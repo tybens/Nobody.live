@@ -11,7 +11,15 @@ Environment variables to be set:
 * `CLIENT_ID`: Your Twitch application client ID (found at https://dev.twitch.tv/console)
 * `CLIENT_SECRET`: Your Twitch application client secret (found at https://dev.twitch.tv/console)
 
-Meanwhile, the Flask app in `app.py` serves the index and the endpoint to get a random streamer. 
+Meanwhile, the Flask app in `app.py` serves the index and the endpoint to get a random streamer.
+
+## TODO:
+- add client counter, to show users how many people are joining them on a raid
+- add a button to invite friends! what's a raid without your friends...
+- button to override current raid, if majority of current clients hit the button 
+- change main button style 
+- ABOUT drop down to describe what a raid is and how the button works
+- 
 
 ## Getting Up and Running
 

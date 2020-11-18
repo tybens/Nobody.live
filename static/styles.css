@@ -55,7 +55,7 @@ a,
   margin-top: 60px;
   text-decoration: none;
   display: inline-block;
-  font-size: 30px;
+  font-size: 22px;
   width: 100%;
   cursor: pointer;
 }
@@ -104,7 +104,7 @@ a,
 }
 
 #content-wrap {
-  padding-bottom: 6px;    /* Footer height */
+  padding-bottom: 6.5rem;    /* Footer height */
 }
 
 #footer {
