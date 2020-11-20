@@ -36,7 +36,7 @@
     <div class="grid-container">
       <div class="intro-text">
         <h1>lonelyraids</h1>
-        <p>collectively joining streams with zero viewers</p>
+        <p style="margin-top: 10px;">collectively joining streams with zero viewers</p>
       </div>
       <!--
       <div class="refresh">
@@ -46,8 +46,7 @@
 
       <div class="join-raid-div">
         <button id="join-raid-button" disabled>please wait...</button>
-
-        <span id="refresh-raid-button" class="cursor-text">check for raids</span>
+        <div id="audience-count"></div>
       </div>
     </div>
 
@@ -62,22 +61,35 @@
       <a href="https://github.com/tybens/lonelyraids.com" target="_blank" rel="noopener">open source</a> made by tyler benson, forked from the great jack kingsman's <i>Nobody.live</i>
     </div>
   </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.min.js" integrity="sha512-/WwtKR6NnHomLo0O4w9QKc1INTPEJs7ko6u2aBTA1paPldhPl8LtXsi7a35iEZ69+9P5dcgVNESG8hrP4Y2t3w==" crossorigin="anonymous"></script>
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script type="text/javascript">
       let server =  window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1:5000':'https://lonelyraids.com';
       var counting = false;
       var raidStream;
       const raidButton = document.getElementById('join-raid-button');
-      const refreshButton = document.getElementById('refresh-raid-button');
+      const audienceCount = document.getElementById('audience-count');
       raidButton.disabled = false;
       raidButton.innerText = 'start raid';
+      var socket = io.connect(server);
+
+      // whenever a connection occurs update the 'raid audience count: ' metric.
+      socket.on('connection', function(connections) {
+        console.log('user has connected, total users: '+ connections);
+        audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
+      });
+
+      // whenever a raid is started, get the countdown (show the user that a raid has started)
+      socket.on('raid started', function() {
+        getCountdown();
+      });
 
       function displayStream(stream) {
         // clear and rerender the embed div
         document.getElementById('twitch-embed').innerHTML = '';
         document.getElementById('twitch-embed').style.display = '';
         document.getElementById('twitch-embed').style.padding = '10px';
+
         new Twitch.Embed('twitch-embed', {
           width: '100%',
           channel: stream.user_name,
@@ -113,7 +125,6 @@
         /*Countdown script*/
       async function countdown(counter) {
         counting = true
-        refreshButton.style.display = 'none';
          // 3 minutes
         var interval = setInterval(function() {
           counter--;
@@ -121,7 +132,6 @@
             clearInterval(interval);
             counting = false;
             raidButton.innerText = 'start raid'
-          refreshButton.style.display = '';
 
           } else {
             var minutes = Math.floor(counter / 60);
@@ -153,8 +163,9 @@
         raidButton.style.margin = '0';
         raidButton.style.padding = '10px 20px';
         raidButton.style.fontSize = '18px';
-        refreshButton.style.fontSize = '12px';
-        refreshButton.style.padding = '2.5px';
+        audienceCount.style.margin = '5px 50px';
+        audienceCount.style.fontSize = '15px';
+
         fetch(`${server}/streamraid`).then(response => response.json())
           .then(stream => {
             // when getRaid is called and we aren't counting start raid
@@ -174,9 +185,8 @@
       // TODO: Allow users to browse random streams until starting a raid on a specific one
       // document.getElementById('new-streamer-button').addEventListener('click', fetchAndRenderRandomStream); 
       raidButton.addEventListener('click', getRaid)
-      refreshButton.addEventListener('click', getCountdown)
 
-      window.onload = getCountdown(); // issue get countdown upon loading the page
+      setTimeout(getCountdown, 500); // issue get countdown upon loading the page
 
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF3B0HFYJ"></script>

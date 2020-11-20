@@ -1,6 +1,14 @@
 # lonelyraids.com
 
-A modification to jkingsman's [Nobody.live](https://github.com/jkingsman/Nobody.live) to allow users to perform "raids" (in this case, where users all collectively tune in to the same stream stream) on twitch streamers with zero viewers.
+A websocket (flask-socketio) modification to jkingsman's [Nobody.live](https://github.com/jkingsman/Nobody.live) to allow users to perform "raids" (in this case, where users all collectively tune in to the same stream stream) on twitch streamers with zero viewers.
+
+## TODO:
+- [x] add websocket to broadcast when a raid is started to all clients 
+- [x] add client counter, to show users how many people are joining them on a raid
+- [x] add a message to invite friends! what's a raid without your friends...
+- [ ] button to override current raid, if majority of current clients hit the button 
+- [ ] ABOUT drop down to describe what a raid is and how the button works
+- [ ] ~change main button style~
 
 ## Architecture
 
@@ -13,13 +21,7 @@ Environment variables to be set:
 
 Meanwhile, the Flask app in `app.py` serves the index and the endpoint to get a random streamer.
 
-## TODO:
-- add client counter, to show users how many people are joining them on a raid
-- add a button to invite friends! what's a raid without your friends...
-- button to override current raid, if majority of current clients hit the button 
-- change main button style 
-- ABOUT drop down to describe what a raid is and how the button works
-- 
+
 
 ## Getting Up and Running
 

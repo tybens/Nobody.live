@@ -9,14 +9,19 @@ from time import sleep
 
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_socketio import SocketIO, send, emit
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 CORS(app)
+app.config['SECRET_KEY'] = 'secret!!'
+socketio = SocketIO(app, cors_allowed_origins='*')
 main_redis = redis.Redis(decode_responses=True, db=0)
 stats_redis = redis.Redis(decode_responses=True, db=1)
+
 streamRaid = None
 raidLength = 60
 countdown = raidLength
+connections = 0
 
 def timer():
     global streamRaid
@@ -62,9 +67,11 @@ def get_streamraid():
     global streamRaid
     global timer_thread
     if streamRaid is None:
+        socketio.emit('raid started', 'someone started a raid')
         streamRaid = getStreams()[0]
         timer_thread = Thread(target=timer)
         timer_thread.start()
+
 
     return streamRaid
 
@@ -106,6 +113,19 @@ def get_stats_human():
             f"{main_redis.dbsize() - 1} streams loaded."
     )
 
+@socketio.on('connect')
+def handleConnect():
+    global connections 
+    connections += 1
+    emit('connection', str(connections), broadcast=True)
+
+@socketio.on('disconnect')
+def handleDisconnect():
+    global connections
+    connections -= 1
+    emit('connection', str(connections), broadcast=True)
+
+
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)

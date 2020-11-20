@@ -1,6 +1,6 @@
 body {
   margin: 10px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: Impact, Haettenschweiler, sans serif;
   background: #131313;
   color: #eeebff;
 }
@@ -8,6 +8,7 @@ body {
 h1,
 p {
   margin: 0;
+
 }
 
 a,
@@ -18,21 +19,51 @@ a,
 }
 
 .container {
-  margin-top: 10px;
-  background-color: #202020;
+  margin-top: 4vh;
+  display: block;
+  position: relative;
+  z-index: 0;
+  background-color: #202020;\
   padding: 10px;
 }
 
-@media only screen and (min-width: 650px) {
+/* this is dumb but idk how else to do it: */
+@media only screen and (max-height: 730px) {
+  .container {
+    margin-top: 6vh;
+  }
+}
+@media only screen and (max-height: 600px) {
+  .container {
+    margin-top: 9vh;
+  }
+}
+@media only screen and (max-height: 500px) {
+  .container {
+    margin-top: 12vh;
+  }
+}
+@media only screen and (max-height: 410px) {
+  .container {
+    margin-top: 15vh;
+  }
+}
+/* shhhhhhhh */
+
+
+@media only screen and (min-width: 680px) {
   .grid-container {
+    z-index: 500;
     display: grid;
     grid-template-columns: 70% 30%;
     grid-template-rows: 1fr;
     grid-gap: 0px 0px;
     grid-template-areas: "intro-text refresh";
     height: 6vh;
+    padding: 10px 0;
   }
   .intro-text {
+    font-family: "Courier New", Courier, monospace;
     grid-area: intro-text;
   }
 
@@ -44,6 +75,8 @@ a,
 
 .intro-text {
   font-style: bold;
+  margin: 10px 10px;
+  text-align: left;
 }
 
 #join-raid-button {
@@ -60,26 +93,24 @@ a,
   cursor: pointer;
 }
 
-#refresh-raid-button {
-  background-color: transparent;
+#audience-count {
+  position: relative;
+  background-color: #202020;
   border: none;
   color: white;
   display: block;
   text-align: center;
   margin: auto;
+  margin: 40px;
   padding: 10px;
-  font-weight: 400;
   text-decoration: underline;
 }
-.cursor-text {
-  cursor: pointer;
-}
+
 .join-raid-div {
-  margin: auto;
   position: absolute;
   width: 300px;
   height: 200px;
-  z-index: 0;
+  z-index: 100;
   top: 50%;
   left: 50%;
   margin: -100px 0 0 -150px;
@@ -95,8 +126,77 @@ a,
 
 #twitch-embed,
 #twitch-embed>iframe {
-  min-height: 100vh;
+  min-height: 95vh;
+
 }
+
+.tooltip {
+  background: transparent;
+  display: inline-block;
+  position: relative;
+}
+#audience-count:hover .inner {
+  top: 120%;
+  opacity: 1;
+  visibility: visible;
+}
+#audience-count:hover .inner:before {
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(2);
+  transition: 0.3s linear;
+}
+
+.inner {
+  padding: 10px;
+  width: 16rem;
+  border-radius: 4px;
+  overflow: hidden;
+  color: #E6E6E6;
+  font-size: 14px;
+  white-space: nowrap;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  transition: 0.3s linear;
+  pointer-events: none;
+}
+.inner:before {
+  content: "";
+  background-color: #323232;
+  height: 250px;
+  width: 250px;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  visibility: hidden;
+  z-index: -1;
+  transform: translate(-50%, -50%) scale(0.1);
+  transition: 0.3s linear, transform 0s 0.3s linear;
+}
+
+.help-tip{
+  content:'?';
+  font-weight: bold;
+  color:#E6E6E6;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  opacity: 0.9;
+  text-align: center;
+  background-color: #6441A4;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 16px;
+  line-height: 23.25px;
+  cursor: default;
+}
+
+
 
 #page-container {
   position: relative;
@@ -107,6 +207,7 @@ a,
   padding-bottom: 6.5rem;    /* Footer height */
 }
 
+
 #footer {
   position: absolute;
   width: 100%;
@@ -115,3 +216,5 @@ a,
   margin-top: 0px;
   bottom: 0px;
 }
+
+
