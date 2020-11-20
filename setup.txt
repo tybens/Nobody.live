@@ -7,15 +7,13 @@ python3 -m venv venv
 source venv/bin/activate
 sudo pip3 install -r requirements.txt
 
-# change app.py PROD to be True
-vim app.py #...
-
 # static files
 sudo mkdir /var/www/static
 sudo mv -v static/* /var/www/static/
+sudo chown 755 /var/www/static
 
 # nginx config
-sudo mv lr-nginx /etc/nginx/sites-available/lr-nginx
+sudo mv etc/lr-nginx /etc/nginx/sites-available/lr-nginx
 sudo ln -s /etc/nginx/sites-available/lr-nginx /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 sudo ufw allow 'Nginx Full'  # not sure if this is necessary (the article said it was)
@@ -24,11 +22,19 @@ sudo ufw allow 'Nginx Full'  # not sure if this is necessary (the article said i
 sudo wget http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
-sudo make # not sure
 sudo make install
 
 # set up supervisor
+mkdir /var/log/streams
 sudo mv etc/supervisor_services.conf /etc/supervisord.conf
-sudo supervisord
+sudo supervisord -c /etc/supervisord.conf  # starts supervisord services
+
+# set up certbot (for https:// ssl verification)
+sudo snap install core
+sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
 
 deactivate # deactivate venv...
+

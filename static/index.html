@@ -75,7 +75,6 @@
 
       // whenever a connection occurs update the 'raid audience count: ' metric.
       socket.on('connection', function(connections) {
-        console.log('user has connected, total users: '+ connections);
         audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
       });
 
@@ -125,7 +124,6 @@
         /*Countdown script*/
       async function countdown(counter) {
         counting = true
-         // 3 minutes
         var interval = setInterval(function() {
           counter--;
           if (counter == 0) {
@@ -189,7 +187,6 @@
       setTimeout(getCountdown, 500); // issue get countdown upon loading the page
 
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF3B0HFYJ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
