@@ -55,10 +55,10 @@ a,
   .grid-container {
     z-index: 500;
     display: grid;
-    grid-template-columns: 70% 30%;
+    grid-template-columns: 60% 10% 30%;
     grid-template-rows: 1fr;
     grid-gap: 0px 0px;
-    grid-template-areas: "intro-text refresh";
+    grid-template-areas: "intro-text override refresh";
     height: 6vh;
     padding: 10px 0;
   }
@@ -69,6 +69,11 @@ a,
 
   .refresh {
     grid-area: refresh;
+    align-self: center;
+  }
+
+  .override {
+    grid-area: override;
     align-self: center;
   }
 }
@@ -90,6 +95,21 @@ a,
   display: inline-block;
   font-size: 22px;
   width: 100%;
+  cursor: pointer;
+}
+
+#override {
+  background-color: #6441A4;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  padding-top: 5px;
+  font-size: 14px;
+  height: 70px;
+  width: 70px;
+  border-radius: 50px;
   cursor: pointer;
 }
 

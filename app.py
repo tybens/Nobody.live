@@ -9,7 +9,7 @@ from time import sleep
 
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 # check if in production and change static location
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -26,19 +26,27 @@ streamRaid = None
 raidLength = 60
 countdown = raidLength
 connections = 0
+class CountdownTask: 
+      
+    def __init__(self): 
+        self._running = True
+          
+    def terminate(self): 
+        self._running = False
+          
+    def run(self):
+        global streamRaid
+        global countdown
+        # countdown
+        while countdown > 0 and self._running:
+            sleep(1)
+            countdown -= 1
+        # reset global variables
+        streamRaid = None
+        countdown = raidLength
 
-def timer():
-    global streamRaid
-    global countdown
-    # countdown
-    while countdown > 0:
-        sleep(1)
-        countdown -= 1
-    # reset global variables
-    streamRaid = None
-    countdown = raidLength
-
-timer_thread = Thread(target=timer)
+c = CountdownTask()
+timer_thread = Thread(target=c.run)
 
 def getStreams(count = 1):
     results = []
@@ -70,10 +78,11 @@ def get_stream():
 def get_streamraid():
     global streamRaid
     global timer_thread
+    global c
+
     if streamRaid is None:
-        socketio.emit('raid started', 'someone started a raid')
         streamRaid = getStreams()[0]
-        timer_thread = Thread(target=timer)
+        timer_thread = Thread(target=c.run)
         timer_thread.start()
 
 
@@ -116,6 +125,27 @@ def get_stats_human():
             f"({round((1 - int(stats['ratelimit_remaining']) / int(stats['ratelimit_limit'])) * 100, 2)}% spent). "
             f"{main_redis.dbsize() - 1} streams loaded."
     )
+
+@socketio.on('override')
+def override():
+    global streamRaid
+    global stop_threads
+    global countdown
+    global c
+
+    c.terminate()    # stop countdown
+    c = CountdownTask() # start a new one
+
+    streamRaid = None
+    countdown = raidLength
+    thisRaid = get_streamraid()
+    print('overrided')
+    emit('overrided', thisRaid, broadcast=True)
+
+@socketio.on('raid started')
+def broadcastRaid():
+    emit('raid started', 'user started a raid', broadcast=True, include_self=False)
+
 
 @socketio.on('connect')
 def handleConnect():

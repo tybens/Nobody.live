@@ -38,14 +38,14 @@
         <h1>lonelyraids</h1>
         <p style="margin-top: 10px;">collectively joining streams with zero viewers</p>
       </div>
-      <!--
-      <div class="refresh">
-        <button id="new-streamer-button" disabled>please wait...</button>
-      </div> -->
+      
+      <div class="override" >
+        <button id="override" style="display: none">vote to<br>change<br>0/1</button>
+      </div>
 
 
       <div class="join-raid-div">
-        <button id="join-raid-button" disabled>please wait...</button>
+        <button id="join-raid-button" disabled>start raid</button>
         <div id="audience-count"></div>
       </div>
     </div>
@@ -65,22 +65,42 @@
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script type="text/javascript">
       let server =  window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1:5000':'https://lonelyraids.com';
-      var counting = false;
-      var raidStream;
       const raidButton = document.getElementById('join-raid-button');
       const audienceCount = document.getElementById('audience-count');
-      raidButton.disabled = false;
-      raidButton.innerText = 'start raid';
       var socket = io.connect(server);
+      const overrideButton = document.getElementById('override')
+
+      // initialize
+      raidButton.disabled = false;
+
+      // global variables
+      var counting = false; // whether or not we are currently counting down
+      var raidStream;  // stream to raid
+      var connections; // current String num of connected users
+      var voteChange = 0; // amount of users that want to change to new
+      var countdownInterval;
 
       // whenever a connection occurs update the 'raid audience count: ' metric.
-      socket.on('connection', function(connections) {
+      socket.on('connection', function(curConnections) {
+        connections = curConnections
         audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
+        overrideButton.innerHTML = 'vote to<br>change<br>'+voteChange+'/'+connections;
       });
 
       // whenever a raid is started, get the countdown (show the user that a raid has started)
       socket.on('raid started', function() {
+        if (confirm('User started a raid, join them?')) {
+          getRaid(false)
+        }
         getCountdown();
+      });
+
+      socket.on('overrided', function(raid) {
+        raidStream = raid;
+        displayStream(raid);
+        getCountdown();
+        voteChange = 0;
+        overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
       });
 
       function displayStream(stream) {
@@ -124,10 +144,10 @@
         /*Countdown script*/
       async function countdown(counter) {
         counting = true
-        var interval = setInterval(function() {
+        countdownInterval = setInterval(function() {
           counter--;
           if (counter == 0) {
-            clearInterval(interval);
+            clearInterval(countdownInterval);
             counting = false;
             raidButton.innerText = 'start raid'
 
@@ -143,7 +163,8 @@
       async function getCountdown() {
         fetch(`${server}/countdown`).then(response => response.json())
           .then(counter => {
-            if ((!counting) && (counter.countdown!= 0)) {
+            if ((counter.countdown!= 0)) {
+              clearInterval(countdownInterval);
               countdown(counter.countdown);
 
             } else {
@@ -155,7 +176,8 @@
       }
 
 
-      async function getRaid() {
+      async function getRaid(clicked) {
+
         // very convulated way of changing button location after first press
         raidButton.parentNode.className = "refresh";
         raidButton.style.margin = '0';
@@ -163,28 +185,46 @@
         raidButton.style.fontSize = '18px';
         audienceCount.style.margin = '5px 50px';
         audienceCount.style.fontSize = '15px';
-
+        overrideButton.style.display = '';
+        
         fetch(`${server}/streamraid`).then(response => response.json())
           .then(stream => {
             // when getRaid is called and we aren't counting start raid
 
             raidStream = stream;
-            displayStream(raidStream);
-
-        
             getCountdown()
+            displayStream(raidStream);
+            if (clicked) {
+              socket.emit('raid started')
+            };
 
           }).catch((error) => {
             console.error('Error:', error);
           });
-        }
-
-
+        } 
       // TODO: Allow users to browse random streams until starting a raid on a specific one
       // document.getElementById('new-streamer-button').addEventListener('click', fetchAndRenderRandomStream); 
-      raidButton.addEventListener('click', getRaid)
+      raidButton.addEventListener('click', function() {
+        getRaid(true);
+      });
+
+      // new stream button
+      overrideButton.addEventListener('click', function() {
+        // add 1 to wantChange
+        voteChange += 1;
+
+        overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
+        // check if wantChange == connections
+        if (voteChange == parseInt(connections)) {
+          // override countdown and get new stream
+          socket.emit('override')
+        }
+
+      });
 
       setTimeout(getCountdown, 500); // issue get countdown upon loading the page
+
+
 
     </script>
     <script>
