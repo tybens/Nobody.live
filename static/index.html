@@ -79,16 +79,16 @@
       var connections; // current String num of connected users
       var voteChange = 0; // amount of users that want to change to new
       var countdownInterval;
+      var voted = false;
 
       // whenever a connection occurs update the 'raid audience count: ' metric.
       socket.on('connection', function(curConnections) {
         voteChange = 0;
+        voted = false;
         connections = curConnections;
         audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
         overrideButton.innerHTML = 'vote to<br>change<br>'+voteChange+'/'+connections;
       });
-
-      socket.on('disconnection')
 
       // whenever a raid is started, get the countdown (show the user that a raid has started)
       socket.on('raid started', function() {
@@ -104,6 +104,7 @@
         getCountdown();
         voteChange = 0;
         overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
+        voted = false;
       });
 
       function displayStream(stream) {
@@ -177,7 +178,23 @@
             console.error('Error:', error);
           });
       }
+      async function voteToChange() {
+        if (!voted) {
+          voted = true
+          // add 1 to wantChange
+          voteChange += 1;
+          if (voteChange > connections) {
+            voteChange = 0;
+          }
 
+          overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
+          // check if wantChange == connections
+          if (voteChange == parseInt(connections)) {
+            // override countdown and get new stream
+            socket.emit('override')
+          }
+        }
+      }
 
       async function getRaid(clicked) {
 
@@ -215,21 +232,7 @@
       });
 
       // new stream button
-      overrideButton.addEventListener('click', function() {
-        // add 1 to wantChange
-        voteChange += 1;
-        if (voteChange > connections) {
-          voteChange = 0;
-        }
-        
-        overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
-        // check if wantChange == connections
-        if (voteChange == parseInt(connections)) {
-          // override countdown and get new stream
-          socket.emit('override')
-        }
-
-      });
+      overrideButton.addEventListener('click', voteToChange);
 
       setTimeout(getCountdown, 500); // issue get countdown upon loading the page
 
