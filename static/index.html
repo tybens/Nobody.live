@@ -82,10 +82,13 @@
 
       // whenever a connection occurs update the 'raid audience count: ' metric.
       socket.on('connection', function(curConnections) {
-        connections = curConnections
+        voteChange = 0;
+        connections = curConnections;
         audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
         overrideButton.innerHTML = 'vote to<br>change<br>'+voteChange+'/'+connections;
       });
+
+      socket.on('disconnection')
 
       // whenever a raid is started, get the countdown (show the user that a raid has started)
       socket.on('raid started', function() {
@@ -186,10 +189,13 @@
         audienceCount.style.margin = '5px 50px';
         audienceCount.style.fontSize = '15px';
         overrideButton.style.display = '';
-        
+
         fetch(`${server}/streamraid`).then(response => response.json())
           .then(stream => {
             // when getRaid is called and we aren't counting start raid
+            if (!counting) { // if we started a raid
+              voteChange = 0;
+            }
 
             raidStream = stream;
             getCountdown()
@@ -212,7 +218,10 @@
       overrideButton.addEventListener('click', function() {
         // add 1 to wantChange
         voteChange += 1;
-
+        if (voteChange > connections) {
+          voteChange = 0;
+        }
+        
         overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
         // check if wantChange == connections
         if (voteChange == parseInt(connections)) {
