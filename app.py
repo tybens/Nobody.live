@@ -146,6 +146,10 @@ def override():
 def broadcastRaid():
     emit('raid started', 'user started a raid', broadcast=True, include_self=False)
 
+@socketio.on('voted')
+def handleVote():
+    emit('voted')
+
 
 @socketio.on('connect')
 def handleConnect():
