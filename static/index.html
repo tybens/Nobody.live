@@ -85,6 +85,7 @@
       socket.on('connection', function(curConnections) {
         voteChange = 0;
         voted = false;
+        overrideButton.style.cursor = 'pointer';
         connections = curConnections;
         audienceCount.innerHTML = '<div class="help-tip">?</div><div class="tooltip">lonely raiders: ' + connections+'<span class="inner">is this number kinda low??<br>go grab some friends to raid with u!</span></div>';
         overrideButton.innerHTML = 'vote to<br>change<br>'+voteChange+'/'+connections;
@@ -105,6 +106,7 @@
         voteChange = 0;
         overrideButton.innerHTML = 'vote to<br>change<br>' + String(voteChange) + '/'+connections;
         voted = false;
+        overrideButton.style.cursor = 'pointer';
       });
 
       function displayStream(stream) {
@@ -180,7 +182,8 @@
       }
       async function voteToChange() {
         if (!voted) {
-          voted = true
+          overrideButton.style.cursor = '';
+          voted = true;
           // add 1 to wantChange
           voteChange += 1;
           if (voteChange > connections) {
