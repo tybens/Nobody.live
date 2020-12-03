@@ -215,14 +215,17 @@
             // when getRaid is called and we aren't counting start raid
             if (!counting) { // if we started a raid
               voteChange = 0;
+              voted = false;
+              overrideButton.style.cursor = 'pointer';
+              
+              if (clicked) {
+                socket.emit('raid started')
+              };
             }
 
             raidStream = stream;
             getCountdown()
             displayStream(raidStream);
-            if (clicked) {
-              socket.emit('raid started')
-            };
 
           }).catch((error) => {
             console.error('Error:', error);
